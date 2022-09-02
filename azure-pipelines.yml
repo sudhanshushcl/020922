@@ -34,7 +34,7 @@
    - task: AzureFunctionApp@1
      displayName: 'Deploy logic app workflows'
      inputs:
-       azureSubscription: 'Visual Studio Enterprise Subscription(ed13cd96-0af8-4edb-8bdb-88a972f7fe11)-sudhanshushcl.020922'
+       azureSubscription: 'Visual Studio Enterprise Subscription(ed13cd96-0af8-4edb-8bdb-88a972f7fe11)'
        appType: 'workflowapp'
        appName: 'S-logApp-290722'
        package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
