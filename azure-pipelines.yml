@@ -1,19 +1,41 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
-trigger:
-- logicAppDep
-
-pool:
-  vmImage: ubuntu-latest
-
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+# Deploy Standard Logic App
+    
+ trigger:
+ - master
+    
+ pool:
+   vmImage: 'windows-latest'
+    
+ variables:
+   buildPlatform: 'Any CPU'
+   buildConfiguration: 'Release'
+    
+ jobs:
+ - job: logic_app_build
+   displayName: 'Build and publish logic app'
+   steps:
+   - task: CopyFiles@2
+     displayName: 'Create project folder'
+     inputs:
+       SourceFolder: '$(System.DefaultWorkingDirectory)'
+       Contents: |
+         **
+       TargetFolder: 'project_output'
+    
+   - task: ArchiveFiles@2
+     displayName: 'Create project zip'
+     inputs:
+       rootFolderOrFile: '$(System.DefaultWorkingDirectory)/project_output'
+       includeRootFolder: false
+       archiveType: 'zip'
+       archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+       replaceExistingArchive: true
+    
+   - task: AzureFunctionApp@1
+     displayName: 'Deploy logic app workflows'
+     inputs:
+       azureSubscription: 'ed13cd96-0af8-4edb-8bdb-88a972f7fe11'
+       appType: 'workflowapp'
+       appName: 'S-logApp-290722'
+       package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+       deploymentMethod: 'zipDeploy'
